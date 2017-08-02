@@ -16,4 +16,4 @@ pub_pause = 60
 log_file = logging.log
 
 [Bitly]
-access_token = 
+access_token =

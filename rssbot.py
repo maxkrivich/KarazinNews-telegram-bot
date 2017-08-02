@@ -1,6 +1,32 @@
 #! venv/bin/python3
 # -*- coding: utf-8 -*-
 
+"""
+
+MIT License
+
+Copyright (c) 2017 Max Krivich
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+"""
+
 import tqdm
 import time
 import json
@@ -29,7 +55,7 @@ class Source(object):
     def __init__(self, config_links):
         self.links = [config_links[i] for i in config_links]
         self.news = []
-        self.refresh()
+        # self.refresh()
 
     def refresh(self):
         self.news = []
@@ -175,15 +201,15 @@ class ExportBot(object):
         news.reverse()
         # Проверяем на наличие в базе ссылки на новость, если нет, то добавляем в базу данных с
         # отложенной публикацией
+        flag = False
         for i in news:
             if not self.db.find_link(i.link):
                 now = int(time.mktime(time.localtime()))
                 i.publish = now + self.pub_pause
                 logging.info('Detect news: %s' % i)
                 self.db.add_news(i)
-                return True
-            else:
-                return False
+                flag = True
+        return flag
 
     def public_posts(self):
         # Получаем 30 последних записей из rss канала и новости из БД, у которых message_id=0
@@ -194,33 +220,40 @@ class ExportBot(object):
         for_publishing = list(set(line) & set(posts_from_db))
         for_publishing = sorted(for_publishing, key=lambda news: news.date)
         # Постинг каждого сообщений
+        flag = False
         for post in for_publishing:
+            flag = True
             text = '<b>%s</b>\n%s\n%s' % (post.title, post.short_description,
                                           self.bit_ly.short_link(post.link))
             a = self.bot.sendMessage(chat_id=self.chat_id,
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
-                                     disable_web_page_preview=True)
+                                     disable_web_page_preview=True,
+                                     disable_notification=True)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)
             logging.info('Public: %s;%s;' % (post, message_id))
             time.sleep(self.delay_between_messages)
+        return flag
 
 
 def main():
-    try:
-        bot = ExportBot()
-        while True:
-            if bot.detect():
-                logging.info('Updating news...')
-                bot.public_posts()
-            else:
-                logging.info('Nothing to post')
-            logging.info('Go sleep')
-            time.sleep(5 * 60 * 60)  # sleep 5 hours
-    except Exception as e:
-        logging.debug(e)
+    while True:
+        try:
+            bot = ExportBot()
+            while True:
+                if bot.detect():
+                    logging.info('Updating news...')
+                    time.sleep(10)
+                    while not bot.public_posts():
+                        pass
+                else:
+                    logging.info('Nothing to post')
+                logging.info('Go sleep')
+                time.sleep(5 * 60 * 60)  # sleep 5 hours
+        except Exception as e:
+            logging.debug(e)
 
 
 if __name__ == '__main__':

@@ -1,1 +1,1 @@
-web: python rssbot.py
+worker: python3 rssbot.py

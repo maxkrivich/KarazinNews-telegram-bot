@@ -1,49 +1,43 @@
 #! venv/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-
-MIT License
-
-Copyright (c) 2017 Max Krivich
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-"""
-
 import tqdm
 import time
 import json
+import config
 import os.path
 import logging
 import requests
 import telegram
 import feedparser
-import configparser
 
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Integer, DateTime, String, ForeignKey, update, and_
+from sqlalchemy import Table, Column, Integer, BigInteger, DateTime, String, update, and_
 
 Base = declarative_base()
+
+
+class TqdmLoggingHandler (logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super(self.__class__, self).__init__(level)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.tqdm.write(msg)
+            self.flush()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.addHandler(TqdmLoggingHandler())
 
 
 class Source(object):
@@ -52,21 +46,30 @@ class Source(object):
     Выделяет из общей информации только интереующие поля: Заголовок, ссылку, дату публикации.
     """
 
-    def __init__(self, config_links):
-        self.links = [config_links[i] for i in config_links]
+    def __init__(self, links):
+        self.links = links
         self.news = []
         # self.refresh()
 
+    def __parse_date(self, date):
+        try:
+            res = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+        except:
+            pass
+        return res
+
     def refresh(self):
         self.news = []
+        current_time = datetime.now()
         for i in self.links:
             data = feedparser.parse(i)
-            for item in data['entries']:  # tqdm
-                self.news.append(News(title=item['title'],
-                                      short_description=item['summary_detail']['value'],
-                                      link=item['link'],
-                                      date=datetime.strptime(item['published'], '%Y-%m-%d %H:%M:%S')))
-
+            for item in tqdm.tqdm(data['entries'], desc='Getting news %s' % i):
+                date = self.__parse_date(item['published'])
+                if (current_time - date).days < 2:
+                    self.news.append(News(title=item['title'],
+                                          short_description=item['summary_detail']['value'],
+                                          link=item['link'],
+                                          date=date))
             time.sleep(2)
 
     def __repr__(self):
@@ -107,19 +110,19 @@ class News(Base):
     # Порядковый номер новости
     id = Column(Integer, primary_key=True)
     # Текст (Заголовок), который будет отправлен в сообщении
-    title = Column(String)
+    title = Column(String, nullable=False)
     # Краткое описание статьи на сайте
     short_description = Column(String)
     # Ссылка на статью на сайте. Так же отправляется в сообщении
-    link = Column(String)
+    link = Column(String, nullable=False, unique=True)
     # Дата появления новости на сайте. Носит Чисто информационный характер.
-    date = Column(DateTime)
+    date = Column(DateTime, nullable=False)
     # Планируемая дата публикации. Сообщение будет отправлено НЕ РАНЬШЕ этой даты. UNIX_TIME.
-    publish = Column(Integer)
+    publish = Column(BigInteger, nullable=False)
     # Информационный столбец. В данной версии функциональной нагрузки не несет.
-    chat_id = Column(Integer)
+    chat_id = Column(BigInteger, nullable=False)
     # Информационный столбец. В данной версии функциональной нагрузки не несет.
-    message_id = Column(Integer)
+    message_id = Column(BigInteger, nullable=False)
 
     def __init__(self, title, short_description, link, date, publish=0, chat_id=0, message_id=0):
         self.link = link
@@ -179,20 +182,14 @@ class ExportBot(object):
     """
 
     def __init__(self):
-        config = configparser.ConfigParser()
-        config.read('./configs')
-        log_file = config['Export_params']['log_file']
-        self.pub_pause = int(config['Export_params']['pub_pause'])
-        self.delay_between_messages = int(
-            config['Export_params']['delay_between_messages'])
-        logging.basicConfig(
-            format='%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s', level=logging.DEBUG, filename='%s' % log_file)
-        self.db = Database(config['Database']['path'])
-        self.src = Source(config['RSS'])
-        self.chat_id = config['Telegram']['chat_id']
-        bot_access_token = config['Telegram']['access_token']
+        self.pub_pause = config.PUBLICATION_PAUSE
+        self.delay_between_messages = config.DELAY_BETWEEN_MESSAGES
+        self.db = Database(config.DATABASE_URL)
+        self.src = Source(config.NEWS_RESOURCES)
+        self.chat_id = config.TELEGRAM_CHAT_ID
+        bot_access_token = config.TELEGRAM_ACCESS_TOKEN
         self.bot = telegram.Bot(token=bot_access_token)
-        self.bit_ly = Bitly(config['Bitly']['access_token'])
+        self.bit_ly = Bitly(config.BITLY_ACCESS_TOKEN)
 
     def detect(self):
         # получаем 30 последних постов из rss-канала
@@ -206,16 +203,21 @@ class ExportBot(object):
             if not self.db.find_link(i.link):
                 now = int(time.mktime(time.localtime()))
                 i.publish = now + self.pub_pause
-                logging.info('Detect news: %s' % i)
+                logger.info('Detect news: %s' % i)
                 self.db.add_news(i)
                 flag = True
         return flag
 
     def public_posts(self):
         # Получаем 30 последних записей из rss канала и новости из БД, у которых message_id=0
+        current_time = datetime.now()
         posts_from_db = self.db.get_post_without_message_id()
         self.src.refresh()
-        line = [i for i in self.src.news]
+        line = []
+        for i in self.src.news:
+            if (current_time - i.date).days < 2:
+                line.append(i)
+
         # Выбор пересечний этих списков
         for_publishing = list(set(line) & set(posts_from_db))
         for_publishing = sorted(for_publishing, key=lambda news: news.date)
@@ -228,12 +230,12 @@ class ExportBot(object):
             a = self.bot.sendMessage(chat_id=self.chat_id,
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
-                                     disable_web_page_preview=True,
-                                     disable_notification=True)
+                                     disable_web_page_preview=True)
+                                    #  disable_notification=True)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)
-            logging.info('Public: %s;%s;' % (post, message_id))
+            logger.info('Public: %s;%s;' % (post, message_id))
             time.sleep(self.delay_between_messages)
         return flag
 
@@ -244,16 +246,15 @@ def main():
             bot = ExportBot()
             while True:
                 if bot.detect():
-                    logging.info('Updating news...')
-                    time.sleep(10)
+                    time.sleep(5)
                     while not bot.public_posts():
                         pass
                 else:
-                    logging.info('Nothing to post')
-                logging.info('Go sleep')
-                time.sleep(5 * 60 * 60)  # sleep 5 hours
+                    logger.info('Nothing to post')
+                logger.info('Go sleep')
+                time.sleep(1 * 60 * 60)  # sleep 1 hours
         except Exception as e:
-            logging.debug(e)
+            logger.exception(e)
 
 
 if __name__ == '__main__':

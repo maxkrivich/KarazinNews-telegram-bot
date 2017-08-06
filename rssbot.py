@@ -1,6 +1,30 @@
 #! venv/bin/python3
 # -*- coding: utf-8 -*-
 
+"""
+MIT License
+
+Copyright (c) 2017 Maxim Krivich
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 import tqdm
 import time
 import json
@@ -15,8 +39,10 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from apscheduler.schedulers.blocking import BlockingScheduler
 from sqlalchemy import Table, Column, Integer, BigInteger, DateTime, String, update, and_
 
+sched = BlockingScheduler()
 Base = declarative_base()
 
 
@@ -231,7 +257,7 @@ class ExportBot(object):
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
                                      disable_web_page_preview=True)
-                                    #  disable_notification=True)
+            #  disable_notification=True)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)
@@ -240,22 +266,20 @@ class ExportBot(object):
         return flag
 
 
+@sched.scheduled_job('interval', minutes=65)
 def main():
-    while True:
-        try:
-            bot = ExportBot()
-            while True:
-                if bot.detect():
-                    time.sleep(5)
-                    while not bot.public_posts():
-                        pass
-                else:
-                    logger.info('Nothing to post')
-                logger.info('Go sleep')
-                time.sleep(1 * 60 * 60)  # sleep 1 hours
-        except Exception as e:
-            logger.exception(e)
+    try:
+        logger.info('Wake up')
+        bot = ExportBot()
+        if bot.detect():
+            time.sleep(5)
+            while not bot.public_posts():
+                pass
+        else:
+            logger.info('Nothing to post')
+        logger.info('Go sleep')
+    except Exception as e:
+        logger.exception(e)
 
 
-if __name__ == '__main__':
-    main()
+sched.start()

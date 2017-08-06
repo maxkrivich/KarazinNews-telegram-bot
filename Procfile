@@ -1,1 +1,1 @@
-worker: python3 rssbot.py
+clock: python3 rssbot.py

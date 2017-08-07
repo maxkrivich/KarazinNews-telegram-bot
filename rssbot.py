@@ -240,7 +240,7 @@ class ExportBot(object):
 
     def public_posts(self):
         # Получаем 30 последних записей из rss канала и новости из БД, у которых message_id=0
-        current_time = datetime.now()
+        current_time = datetime.utcnow().replace(tzinfo=pytz.UTC)
         posts_from_db = self.db.get_post_without_message_id()
         self.src.refresh()
         line = []

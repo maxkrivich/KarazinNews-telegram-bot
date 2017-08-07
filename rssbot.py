@@ -28,6 +28,7 @@ SOFTWARE.
 import tqdm
 import time
 import json
+import pytz
 import config
 import os.path
 import logging
@@ -78,19 +79,22 @@ class Source(object):
         # self.refresh()
 
     def __parse_date(self, date):
-        try:
-            res = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-        except:
-            pass
+        formats = ['%Y-%m-%d %H:%M:%S', '%a, %d %b %Y %H:%M:%S %z']
+        for f in formats:
+            try:
+                res = datetime.strptime(date, f)
+            except:
+                continue
         return res
 
     def refresh(self):
         self.news = []
-        current_time = datetime.now()
+        current_time = datetime.utcnow().replace(tzinfo=pytz.UTC)
         for i in self.links:
             data = feedparser.parse(i)
             for item in tqdm.tqdm(data['entries'], desc='Getting news %s' % i):
-                date = self.__parse_date(item['published'])
+                print(item['published'])
+                date = self.__parse_date(item['published']).replace(tzinfo=pytz.UTC)
                 if (current_time - date).days < 2:
                     self.news.append(News(title=item['title'],
                                           short_description=item['summary_detail']['value'],

@@ -47,7 +47,7 @@ sched = BlockingScheduler()
 Base = declarative_base()
 
 
-class TqdmLoggingHandler (logging.Handler):
+class TqdmLoggingHandler(logging.Handler):
     def __init__(self, level=logging.NOTSET):
         super(self.__class__, self).__init__(level)
 
@@ -93,7 +93,6 @@ class Source(object):
         for i in self.links:
             data = feedparser.parse(i)
             for item in tqdm.tqdm(data['entries'], desc='Getting news %s' % i):
-                print(item['published'])
                 date = self.__parse_date(item['published']).replace(tzinfo=pytz.UTC)
                 if (current_time - date).days < 2:
                     self.news.append(News(title=item['title'],
@@ -261,16 +260,18 @@ class ExportBot(object):
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
                                      disable_web_page_preview=True)
-            #  disable_notification=True)
+            						 #disable_notification=True)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)
             logger.info('Public: %s;%s;' % (post, message_id))
             time.sleep(self.delay_between_messages)
+        if flag:
+            self.db.session.close()
         return flag
 
 
-@sched.scheduled_job('interval', minutes=65)
+@sched.scheduled_job('interval', minutes=15)
 def main():
     try:
         logger.info('Wake up')

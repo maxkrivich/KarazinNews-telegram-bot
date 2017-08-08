@@ -47,6 +47,16 @@ sched = BlockingScheduler()
 Base = declarative_base()
 
 
+def singleton(class_):
+    instances = {}
+
+    def getinstance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        return instances[class_]
+    return getinstance
+
+
 class TqdmLoggingHandler(logging.Handler):
     def __init__(self, level=logging.NOTSET):
         super(self.__class__, self).__init__(level)
@@ -93,7 +103,8 @@ class Source(object):
         for i in self.links:
             data = feedparser.parse(i)
             for item in tqdm.tqdm(data['entries'], desc='Getting news %s' % i):
-                date = self.__parse_date(item['published']).replace(tzinfo=pytz.UTC)
+                date = self.__parse_date(
+                    item['published']).replace(tzinfo=pytz.UTC)
                 if (current_time - date).days < 2:
                     self.news.append(News(title=item['title'],
                                           short_description=item['summary_detail']['value'],
@@ -175,6 +186,7 @@ class News(Base):
         return "<News ('%s','%s', %s)>" % (self.title, self.link, self.date)
 
 
+@singleton
 class Database(object):
     """
     Класс для обработки сессии SQLAlchemy.
@@ -237,6 +249,9 @@ class ExportBot(object):
                 flag = True
         return flag
 
+    def send_error(self, msg):
+        self.bot.sendMessage(chat_id='296266', text=msg)
+
     def public_posts(self):
         # Получаем 30 последних записей из rss канала и новости из БД, у которых message_id=0
         current_time = datetime.utcnow().replace(tzinfo=pytz.UTC)
@@ -260,7 +275,7 @@ class ExportBot(object):
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
                                      disable_web_page_preview=True)
-            						 #disable_notification=True)
+            # disable_notification=True)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)
@@ -284,7 +299,13 @@ def main():
             logger.info('Nothing to post')
         logger.info('Go sleep')
     except Exception as e:
+        bot.send_error(e)
         logger.exception(e)
 
 
 sched.start()
+
+# if __name__ == '__main__':
+#     db1 = Database(config.DATABASE_URL)
+#     db2 = Database(config.DATABASE_URL)
+#     print(id(db1), id(db2))

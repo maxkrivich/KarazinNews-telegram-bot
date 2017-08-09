@@ -116,6 +116,30 @@ class Source(object):
         return "<RSS ('%s','%s')>" % (self.links, len(self.news))
 
 
+class GOOGL(object):
+    """
+    Класс для работы с api goo.gl
+    Этот класс служит сокращение ссылок с помощью сервиса goo.gl
+    """
+    url = 'https://www.googleapis.com/urlshortener/v1/url?key={at}'
+
+    def __init__(self, access_token):
+        self.access_token = access_token
+
+    def short_link(self, long_link):
+        payload = {'longUrl': long_link}
+        headers = {'Content-type': 'application/json'}
+        try:
+            r = requests.post(self.url.format(
+                at=self.access_token), data=json.dumps(payload), headers=headers)
+            if r.status_code == 200:
+                return r.json()['id']
+            else:
+                raise Exception('')
+        except Exception as e:
+            return long_link
+
+
 class Bitly(object):
     """
     Класс для работы с api bitly.com
@@ -230,7 +254,8 @@ class ExportBot(object):
         self.chat_id = config.TELEGRAM_CHAT_ID
         bot_access_token = config.TELEGRAM_ACCESS_TOKEN
         self.bot = telegram.Bot(token=bot_access_token)
-        self.bit_ly = Bitly(config.BITLY_ACCESS_TOKEN)
+        # self.bit_ly = Bitly(config.BITLY_ACCESS_TOKEN)
+        self.goo_gl = GOOGL(config.GOOGL_ACCESS_TOKEN)
 
     def detect(self):
         # получаем 30 последних постов из rss-канала
@@ -270,7 +295,7 @@ class ExportBot(object):
         for post in for_publishing:
             flag = True
             text = '<b>%s</b>\n%s\n%s' % (post.title, post.short_description,
-                                          self.bit_ly.short_link(post.link))
+                                          self.goo_gl.short_link(post.link))
             a = self.bot.sendMessage(chat_id=self.chat_id,
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,

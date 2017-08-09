@@ -43,6 +43,8 @@ TELEGRAM_ACCESS_TOKEN = os.environ['TELEGRAM_ACCESS_TOKEN']
 
 BITLY_ACCESS_TOKEN = os.environ['BITLY_ACCESS_TOKEN']
 
+GOOGL_ACCESS_TOKEN = os.environ['GOOGL_ACCESS_TOKEN']
+
 DATABASE_URL = os.environ['DATABASE_URL']
 
 if __name__ == "__main__":

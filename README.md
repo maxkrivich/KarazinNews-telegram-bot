@@ -1,6 +1,6 @@
 # KarazinNews RSS telegram bot
 [![License](https://img.shields.io/badge/license-MIT%20license-green.svg?style=flat)]()
-[![Telegram](https://img.shields.io/badge/telegram-chanel-orange.svg?style=flat)](https://t.me/karazina)
+[![Telegram](https://img.shields.io/badge/telegram-channel-orange.svg?style=flat)](https://t.me/karazina)
 [![Python](https://img.shields.io/badge/python-3.5,%203.6-blue.svg?style=flat)]()
 [![Requires.io](https://requires.io/github/maxkrivich/KarazinNews-telegram-bot/requirements.svg?branch=master&style=flat)](https://requires.io/github/maxkrivich/KarazinNews-telegram-bot/requirements/?branch=master)
 

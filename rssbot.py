@@ -32,6 +32,7 @@ import pytz
 import config
 import os.path
 import logging
+import messages
 import requests
 import telegram
 import feedparser
@@ -254,8 +255,8 @@ class ExportBot(object):
         self.chat_id = config.TELEGRAM_CHAT_ID
         bot_access_token = config.TELEGRAM_ACCESS_TOKEN
         self.bot = telegram.Bot(token=bot_access_token)
-        # self.bit_ly = Bitly(config.BITLY_ACCESS_TOKEN)
-        self.goo_gl = GOOGL(config.GOOGL_ACCESS_TOKEN)
+        # self.url_shortener = Bitly(config.BITLY_ACCESS_TOKEN)
+        self.url_shortener = GOOGL(config.GOOGL_ACCESS_TOKEN)
 
     def detect(self):
         # получаем 30 последних постов из rss-канала
@@ -281,7 +282,7 @@ class ExportBot(object):
         # Получаем 30 последних записей из rss канала и новости из БД, у которых message_id=0
         current_time = datetime.utcnow().replace(tzinfo=pytz.UTC)
         posts_from_db = self.db.get_post_without_message_id()
-        self.src.refresh()
+        # self.src.refresh()
         line = []
         for i in self.src.news:
             if (current_time - i.date).days < 2:
@@ -294,13 +295,14 @@ class ExportBot(object):
         flag = False
         for post in for_publishing:
             flag = True
-            text = '<b>%s</b>\n%s\n%s' % (post.title, post.short_description,
-                                          self.goo_gl.short_link(post.link))
+            text = messages.POST_MESSAGE.format(title=post.title,
+                                                summary=post.short_description,
+                                                link=self.url_shortener.short_link(post.link))
             a = self.bot.sendMessage(chat_id=self.chat_id,
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
-                                     disable_web_page_preview=True)
-            # disable_notification=True)
+                                     disable_web_page_preview=True,
+                                     disable_notification=False)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)

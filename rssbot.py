@@ -322,7 +322,7 @@ class ExportBot(object):
 def main():
     try:
         logger.info('Wake up')
-        bot = ExportBot
+        bot = ExportBot()
         if bot.detect() or not bot.isUpdated():
             time.sleep(5)
             while not bot.public_posts():

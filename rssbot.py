@@ -29,6 +29,7 @@ import tqdm
 import time
 import json
 import pytz
+import pprint
 import config
 import os.path
 import logging
@@ -111,6 +112,7 @@ class Source(object):
                                           short_description=item['summary_detail']['value'],
                                           link=item['link'],
                                           date=date))
+                    # pprint.pprint(item)
             time.sleep(2)
 
     def __repr__(self):
@@ -278,11 +280,14 @@ class ExportBot(object):
     def send_error(self, msg):
         self.bot.sendMessage(chat_id='296266', text=msg)
 
+    def isUpdated(self):
+        return len(self.db.get_post_without_message_id()) == 0
+
     def public_posts(self):
         # Получаем 30 последних записей из rss канала и новости из БД, у которых message_id=0
         current_time = datetime.utcnow().replace(tzinfo=pytz.UTC)
         posts_from_db = self.db.get_post_without_message_id()
-        # self.src.refresh()
+        self.src.refresh()
         line = []
         for i in self.src.news:
             if (current_time - i.date).days < 2:
@@ -317,8 +322,8 @@ class ExportBot(object):
 def main():
     try:
         logger.info('Wake up')
-        bot = ExportBot()
-        if bot.detect():
+        bot = ExportBot
+        if bot.detect() or not bot.isUpdated():
             time.sleep(5)
             while not bot.public_posts():
                 pass
@@ -333,6 +338,7 @@ def main():
 sched.start()
 
 # if __name__ == '__main__':
+    # main()
 #     db1 = Database(config.DATABASE_URL)
 #     db2 = Database(config.DATABASE_URL)
 #     print(id(db1), id(db2))

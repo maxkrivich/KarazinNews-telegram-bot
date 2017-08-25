@@ -136,7 +136,7 @@ class GOOGL(object):
                 return r.json()['id']
             else:
                 raise Exception('')
-        except Exception as e:
+        except Exception:
             return long_link
 
 

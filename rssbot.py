@@ -1,4 +1,4 @@
-#! venv/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -29,9 +29,7 @@ import tqdm
 import time
 import json
 import pytz
-import pprint
 import config
-import os.path
 import logging
 import messages
 import requests
@@ -43,7 +41,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from apscheduler.schedulers.blocking import BlockingScheduler
-from sqlalchemy import Table, Column, Integer, BigInteger, DateTime, String, update, and_
+from sqlalchemy import Column, Integer, BigInteger, DateTime, String, and_
 
 sched = BlockingScheduler()
 Base = declarative_base()
@@ -90,14 +88,13 @@ class Source(object):
         self.news = []
         # self.refresh()
 
-    def __parse_date(self, date):
-        formats = ['%Y-%m-%d %H:%M:%S', '%a, %d %b %Y %H:%M:%S %z']
-        for f in formats:
-            try:
-                res = datetime.strptime(date, f)
-            except:
-                continue
-        return res
+    @classmethod
+    def __parse_date(cls, date_str):
+        try:
+            return datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            pass
+        return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
 
     def refresh(self):
         self.news = []
@@ -240,7 +237,7 @@ class Database(object):
         self.session.commit()
 
     def find_link(self, link):
-        return self.session.query(News).filter_by(link=link).first() is not None
+        return bool(self.session.query(News).filter_by(link=link).first())
 
 
 class ExportBot(object):
@@ -338,7 +335,7 @@ def main():
 sched.start()
 
 # if __name__ == '__main__':
-    # main()
+#     main()
 #     db1 = Database(config.DATABASE_URL)
 #     db2 = Database(config.DATABASE_URL)
 #     print(id(db1), id(db2))

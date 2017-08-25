@@ -1,17 +1,35 @@
 language: python
+
 cache: pip
+
 python:
-    - 2.7.13
-    - 3.6
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.5-dev" # 3.5 development branch
+  - "3.6"
+  - "3.6-dev" # 3.6 development branch
+  - "3.7-dev" # 3.7 development branch
+  - "nightly" # currently points to 3.7-dev
+
 install:
     - pip install flake8
+
 before_script:
     # stop the build if there are Python syntax errors or undefined names
     - time flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
     # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
     - time flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
 script:
     - true  # <-- add other tests here...
+
 notifications:
-    on_success: change
-    on_failure: change  # `always` will be the setting once code changes slow down
+  email:
+    recipients:
+      - maxkrivich@gmail.com
+    on_success: never # default: change
+    on_failure: always # default: always

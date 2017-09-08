@@ -1,9 +1,15 @@
+
+<p align="center">
+  <img width="300" height="300" src="https://psv4.userapi.com/c816428/u54497014/docs/ad63285a2c15/photo_2017-08-20_21-49-02.jpg?extra=y9WvQllMQAER7Pto6tWB1KEp-eI8x9DW2ZPrN96YxGLE2o6YyIPqAaweTcjr86j2ubY1cHi5DBYtd_VatzkfhxBaJertsefMDWWzPR7X1UOorYjN0HNgdg">
+</p>
+
 # KarazinNews RSS telegram bot
 [![License](https://img.shields.io/badge/license-MIT%20license-green.svg?style=flat)]()
 [![Telegram](https://img.shields.io/badge/telegram-channel-orange.svg?style=flat)](https://t.me/karazina)
 [![Python](https://img.shields.io/badge/python-3.5,%203.6-blue.svg?style=flat)]()
 [![Requires.io](https://requires.io/github/maxkrivich/KarazinNews-telegram-bot/requirements.svg?branch=master&style=flat)](https://requires.io/github/maxkrivich/KarazinNews-telegram-bot/requirements/?branch=master)
 [![Build Status](https://travis-ci.org/maxkrivich/KarazinNews-telegram-bot.svg?branch=master)](https://travis-ci.org/maxkrivich/KarazinNews-telegram-bot)
+
 
 This is a simple in use bot what collect the [University](http://univer.kharkov.ua/en) news from few main rss sources and posting them in [telegram channel](https://t.me/karazina).
 

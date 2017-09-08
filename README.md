@@ -7,7 +7,26 @@
 
 This is a simple in use bot what collect the [University](http://univer.kharkov.ua/en) news from few main rss sources and posting them in [telegram channel](https://t.me/karazina).
 
+### RSS sources
+List of RSS feeds:
+- http://www.univer.kharkov.ua/rss/anons.rss
+- http://www.univer.kharkov.ua/rss/news.rss
+- http://www.univer.kharkov.ua/rss/conf.rss
+- http://landaucentre.org/feed/
+- http://career.karazin.ua/feed/
+- http://profkom.ua/feed/
+- http://unk.kh.ua/feed/
+
 If you find [bugs] or have [suggestions] about improving the module, don't hesitate to contact [me].
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/maxkrivich/KarazinNews-telegram-bot/blob/master/LICENSE) file for details
+
+Copyright (c) 2017 - Maxim Krivich
+
+[maxkrivich.github.io](https://maxkrivich.github.io/)
+
 
 [bugs]: <https://github.com/maxkrivich/KarazinNews-telegram-bot/issues>
 [suggestions]: <https://github.com/maxkrivich/KarazinNews-telegram-bot/issues>

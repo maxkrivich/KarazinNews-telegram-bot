@@ -1,4 +1,4 @@
-#! venv/bin/python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -27,3 +27,7 @@ SOFTWARE.
 
 
 POST_MESSAGE = "<b>{title}</b>\n{summary}\n{link}"
+
+START_MESSAGE = "Привіт, {name}!\nПідписуйся на канал: @karazina"
+
+UNKNOWN_ACTION = "Не розумію\U0001F62D, будь ласка, перевірте правильність набраних даних!"

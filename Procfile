@@ -1,1 +1,2 @@
-clock: python3 rssbot.py
+web: gunicorn bot:server
+clock: python rssbot.py

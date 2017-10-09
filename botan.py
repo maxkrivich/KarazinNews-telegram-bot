@@ -25,38 +25,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import os
-import configparser
+import json
+import config
+import requests
 
-config = configparser.ConfigParser()
-config.read('./configs.ini')
 
-DELAY_BETWEEN_MESSAGES = int(config['Export_params']['delay_between_messages'])
+TRACK_URL = 'https://api.botan.io/track'
 
-PUBLICATION_PAUSE = int(config['Export_params']['pub_pause'])
 
-NEWS_RESOURCES = [config['RSS'][i] for i in config['RSS']]
+def make_json(message):
+    data = {}
+    data['message_id'] = message.message_id
+    data['from'] = {}
+    data['from']['id'] = message.from_user.id
+    if message.from_user.username is not None:
+        data['from']['username'] = message.from_user.username
+    data['chat'] = {}
 
-TELEGRAM_CHAT_ID = -1001095757205
+    data['chat']['id'] = message.chat.id
+    return data
 
-TELEGRAM_ACCESS_TOKEN = os.environ['TELEGRAM_ACCESS_TOKEN']
 
-BITLY_ACCESS_TOKEN = os.environ['BITLY_ACCESS_TOKEN']
-
-GOOGL_ACCESS_TOKEN = os.environ['GOOGL_ACCESS_TOKEN']
-
-DATABASE_URL = os.environ['DATABASE_URL']
-
-HEROKU_URL = os.environ['HEROKU_URL']
-
-BOTANIO_ACCESS_TOKEN = os.environ['BOTANIO_ACCESS_TOKEN']
-
-if __name__ == "__main__":
-    print(DELAY_BETWEEN_MESSAGES)
-    print(PUBLICATION_PAUSE)
-    print(NEWS_RESOURCES)
-    print(TELEGRAM_CHAT_ID)
-    print(TELEGRAM_ACCESS_TOKEN)
-    print(BITLY_ACCESS_TOKEN)
-    print(GOOGL_ACCESS_TOKEN)
-    print(DATABASE_URL)
+def track(uid, message, name='Message', token=config.BOTANIO_ACCESS_TOKEN):
+    try:
+        r = requests.post(
+            TRACK_URL,
+            params={"token": token, "uid": uid, "name": name},
+            data=json.dumps(make_json(message)),
+            headers={'Content-type': 'application/json'},
+        )
+        return r.json()
+    except requests.exceptions.Timeout as e:
+        # set up for a retry, or continue in a retry loop
+        print(e)
+        return False
+    except (requests.exceptions.RequestException, ValueError) as e:
+        # catastrophic error
+        print(e)
+        return False

@@ -304,7 +304,7 @@ class ExportBot(object):
                                      text=text,
                                      parse_mode=telegram.ParseMode.HTML,
                                      disable_web_page_preview=True,
-                                     disable_notification=False)
+                                     disable_notification=True)
             message_id = a.message_id
             chat_id = a['chat']['id']
             self.db.update(post.link, chat_id, message_id)
@@ -315,7 +315,7 @@ class ExportBot(object):
         return flag
 
 
-@sched.scheduled_job('interval', minutes=15)
+@sched.scheduled_job('interval', day_of_week='mon-fri', hour=10)
 def main():
     try:
         logger.info('Wake up')

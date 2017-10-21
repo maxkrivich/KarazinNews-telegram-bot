@@ -42,6 +42,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from sqlalchemy import Column, Integer, BigInteger, DateTime, String, and_
+from telegraph import Telegraph
 
 sched = BlockingScheduler()
 Base = declarative_base()

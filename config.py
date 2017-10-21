@@ -47,9 +47,6 @@ GOOGL_ACCESS_TOKEN = os.environ['GOOGL_ACCESS_TOKEN']
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-HEROKU_URL = os.environ['HEROKU_URL']
-
-BOTANIO_ACCESS_TOKEN = os.environ['BOTANIO_ACCESS_TOKEN']
 
 if __name__ == "__main__":
     print(DELAY_BETWEEN_MESSAGES)

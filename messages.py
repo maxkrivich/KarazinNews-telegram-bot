@@ -26,4 +26,5 @@ SOFTWARE.
 """
 
 
-POST_MESSAGE = "<b>{title}</b>\n{summary}\n{link}"
+POST_MESSAGE = "<b>{title}</b>\n<i>via</i> {link}"
+TELEGRAPH_TML = '<img src="{img}"/>{text}<p><i>Source: </i><a href="{link}">{slink}</a></p>'

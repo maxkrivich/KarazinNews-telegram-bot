@@ -42,7 +42,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from sqlalchemy import Column, Integer, BigInteger, DateTime, String, and_
-from telegraph import Telegraph
+from html_telegraph_poster import upload_to_telegraph
+from html_telegraph_poster.upload_images import upload_image
+from newspaper import Article
+from urllib.parse import urlparse
+
+import nltk
+nltk.download('punkt')
 
 sched = BlockingScheduler()
 Base = declarative_base()
@@ -255,8 +261,8 @@ class ExportBot(object):
         self.chat_id = config.TELEGRAM_CHAT_ID
         bot_access_token = config.TELEGRAM_ACCESS_TOKEN
         self.bot = telegram.Bot(token=bot_access_token)
-        # self.url_shortener = Bitly(config.BITLY_ACCESS_TOKEN)
-        self.url_shortener = GOOGL(config.GOOGL_ACCESS_TOKEN)
+        self.url_shortener = Bitly(config.BITLY_ACCESS_TOKEN)
+        # self.url_shortener = GOOGL(config.GOOGL_ACCESS_TOKEN)
 
     def detect(self):
         # получаем 30 последних постов из rss-канала
@@ -278,7 +284,7 @@ class ExportBot(object):
     def send_error(self, msg):
         self.bot.sendMessage(chat_id='296266', text=msg)
 
-    def isUpdated(self):
+    def updated(self):
         return len(self.db.get_post_without_message_id()) == 0
 
     def public_posts(self):
@@ -298,19 +304,32 @@ class ExportBot(object):
         flag = False
         for post in for_publishing:
             flag = True
-            text = messages.POST_MESSAGE.format(title=post.title,
-                                                summary=post.short_description,
-                                                link=self.url_shortener.short_link(post.link))
-            a = self.bot.sendMessage(chat_id=self.chat_id,
-                                     text=text,
-                                     parse_mode=telegram.ParseMode.HTML,
-                                     disable_web_page_preview=True,
-                                     disable_notification=True)
-            message_id = a.message_id
-            chat_id = a['chat']['id']
-            self.db.update(post.link, chat_id, message_id)
-            logger.info('Public: %s;%s;' % (post, message_id))
-            time.sleep(self.delay_between_messages)
+            try:
+                article = Article(post.link, language='uk')
+                article.download()
+                article.parse()
+                article.nlp()
+                img = upload_image(article.top_image)
+                parsed_uri = urlparse(url)
+                tel_text = messages.TELEGRAPH_TML.format(img=img,
+                                                        text=article.text.replace('\n', '<br/>'),
+                                                        slink=parsed_uri.netloc,
+                                                        link=self.url_shortener.short_link(post.link))
+                url = upload_to_telegraph(title=title,  author='Max Krivich', text=tel_text, author_url='https://t.me/maxkrivich')['url']
+
+                text = messages.POST_MESSAGE.format(title=post.title,
+                                                    link=url)
+                a = self.bot.sendMessage(chat_id=self.chat_id,
+                                        text=text,
+                                        parse_mode=telegram.ParseMode.HTML,
+                                        disable_notification=True)
+                message_id = a.message_id
+                chat_id = a['chat']['id']
+                self.db.update(post.link, chat_id, message_id)
+                logger.info('Public: %s;%s;' % (post, message_id))
+                time.sleep(self.delay_between_messages)
+            except Exception as e:
+                logger.exception(e)
         if flag:
             self.db.session.close()
         return flag
@@ -321,7 +340,7 @@ def main():
     try:
         logger.info('Wake up')
         bot = ExportBot()
-        if bot.detect() or not bot.isUpdated():
+        if bot.detect() or not bot.updated():
             time.sleep(5)
             while not bot.public_posts():
                 pass

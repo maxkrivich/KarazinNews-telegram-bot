@@ -310,12 +310,12 @@ class ExportBot(object):
                 article.parse()
                 article.nlp()
                 img = upload_image(article.top_image)
-                parsed_uri = urlparse(url)
+                parsed_uri = urlparse(post.link)
                 tel_text = messages.TELEGRAPH_TML.format(img=img,
                                                         text=article.text.replace('\n', '<br/>'),
                                                         slink=parsed_uri.netloc,
                                                         link=self.url_shortener.short_link(post.link))
-                url = upload_to_telegraph(title=title,  author='Max Krivich', text=tel_text, author_url='https://t.me/maxkrivich')['url']
+                url = upload_to_telegraph(title=post.title, author='Max Krivich', text=tel_text, author_url='https://t.me/maxkrivich')['url']
 
                 text = messages.POST_MESSAGE.format(title=post.title,
                                                     link=url)

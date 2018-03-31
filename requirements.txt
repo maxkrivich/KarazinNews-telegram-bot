@@ -13,5 +13,5 @@ SQLAlchemy==1.1.14
 tqdm==4.19.4
 tzlocal==1.4
 urllib3==1.22
-newspaper3k==0.1.5
+newspaper3k==0.2.6
 html-telegraph-poster==0.1.31

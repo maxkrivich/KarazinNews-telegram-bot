@@ -336,7 +336,7 @@ class ExportBot(object):
         return flag
 
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour=3)
+@sched.scheduled_job('interval', hours=2)
 def main():
     try:
         logger.info('Wake up')

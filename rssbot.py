@@ -311,8 +311,9 @@ class ExportBot(object):
                 article.nlp()
                 img = upload_image(article.top_image)
                 parsed_uri = urlparse(post.link)
+                text = ''.join(map(lambda s: '<p>{}</p>'.format(s),  article.text.split('\n')))
                 tel_text = messages.TELEGRAPH_TML.format(img=img,
-                                                        text=article.text.replace('\n', '<br/>'),
+                                                        text=text,
                                                         slink=parsed_uri.netloc,
                                                         link=self.url_shortener.short_link(post.link))
                 url = upload_to_telegraph(title=post.title, author='Max Krivich', text=tel_text, author_url='https://t.me/maxkrivich')['url']
@@ -335,7 +336,7 @@ class ExportBot(object):
         return flag
 
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour=3)
+@sched.scheduled_job('interval', hours=2)
 def main():
     try:
         logger.info('Wake up')

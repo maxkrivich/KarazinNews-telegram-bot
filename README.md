@@ -1,34 +1,53 @@
 # KarazinNews RSS telegram bot
 [![License](https://img.shields.io/badge/license-MIT%20license-green.svg?style=flat)]()
 [![Telegram](https://img.shields.io/badge/telegram-channel-orange.svg?style=flat)](https://t.me/karazina)
-[![Python](https://img.shields.io/badge/python-3.5,%203.6-blue.svg?style=flat)]()
+[![Python](https://img.shields.io/badge/python-3.8-blue.svg?style=flat)]()
 [![Requires.io](https://requires.io/github/maxkrivich/KarazinNews-telegram-bot/requirements.svg?branch=master&style=flat)](https://requires.io/github/maxkrivich/KarazinNews-telegram-bot/requirements/?branch=master)
 [![Build Status](https://travis-ci.org/maxkrivich/KarazinNews-telegram-bot.svg?branch=master)](https://travis-ci.org/maxkrivich/KarazinNews-telegram-bot)
 
 
-This is a simple in use bot what collect the [University](http://univer.kharkov.ua/en) news from few main rss sources and posting them in [telegram channel](https://t.me/karazina).
+This is an unofficial Telegram-bot for [V.N. Karazin University](http://univer.kharkov.ua/en) which aggregates several useful sources for each student and professor of the uni. The main idea behind is quite simple to have all of the news in one [place](https://t.me/karazina).
 
-### RSS sources
-List of RSS feeds:
-- http://www.univer.kharkov.ua/rss/anons.rss
-- http://www.univer.kharkov.ua/rss/news.rss
-- http://www.univer.kharkov.ua/rss/conf.rss
-- http://landaucentre.org/feed/
-- http://career.karazin.ua/feed/
-- http://profkom.ua/feed/
-- http://unk.kh.ua/feed/
+![image](https://user-images.githubusercontent.com/12199867/101933467-87ac6c00-3bdc-11eb-97e9-9d2364435f98.png)
 
-If you find [bugs] or have [suggestions] about improving the module, don't hesitate to contact [me].
+
+## Tech details
+The bot is written in Python 3.8 and deployed into Heroku Cloud with Travis CI. In the current implementation, bot are using RSS-feed of various new sources.
+
+
+### Local testing
+If you are interested in contributing to the project you are very welcome! In this section, you can find commands which help you to setup the project on your local machine.
+
+```bash
+# step 0: Clone the repo
+$ gh repo clone maxkrivich/KarazinNews-telegram-bot
+$ cd KarazinNews-telegram-bot
+
+# step 1: Setup virtualenv for the project
+$ virtualenv --python=python3.8 .venv
+$ source .venv/bin/activate
+$ pip install -r requirements-dev.txt
+
+# step 2: Specify environment variables
+$ cp .env.example .env
+$ vim .env
+
+# step 3: DB setup
+$ docker-compose -f docker-compose.dev.yaml up -d
+
+# step 4: Launch script
+$ python run.py
+
+```
+
+If you find [bugs] or have [suggestions] about improving the module, don't hesitate to contact me.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/maxkrivich/KarazinNews-telegram-bot/blob/master/LICENSE) file for details
 
-Copyright (c) 2017 - Maxim Krivich
-
-[maxkrivich.github.io](https://maxkrivich.github.io/)
+Copyright (c) 2017-2020 - Maxim Krivich
 
 
 [bugs]: <https://github.com/maxkrivich/KarazinNews-telegram-bot/issues>
 [suggestions]: <https://github.com/maxkrivich/KarazinNews-telegram-bot/issues>
-[me]: <https://maxkrivich.github.io>

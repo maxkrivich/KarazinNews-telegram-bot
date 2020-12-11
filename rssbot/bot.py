@@ -8,8 +8,8 @@ import newspaper
 import nltk
 import telegram
 
-from sqlalchemy import and_
 from html_telegraph_poster.upload_images import upload_image
+from sqlalchemy import and_
 
 from rssbot import Database, News
 

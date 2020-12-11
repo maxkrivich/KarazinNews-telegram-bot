@@ -3,7 +3,7 @@ language: python
 cache: pip
 
 python:
-  - "3.8"
+  - '3.8'
 
 install:
   - pip install -r requirements-ci.txt
@@ -16,11 +16,11 @@ script: true
 deploy:
   provider: heroku
   api_key:
-    secure: BI32xLyaO64yS1YNCTodhmnXb9hGeeZIDPPhMw18OBKXMYFC8/vjioeJiQMHNDryBhtttTKD+uXXMPfvmZ94UdPaKynv5p9fYSrwWM7A937OCoH3Bvdze4J/wtVqc8SuSH5pEBpkexCHdI6kFj0aNfOppKKc7eroUi1IrREm5rW+ujRw/iYk9aZBzaq2LUQK6zifqVwUbb747LvAD2Gsq11DsqSXx1A/gCcy5hqLBczfoTgePgkF4yANA+wrinJugT48ayMKZ4txSg7JjbpPowvZTUTt5MAmiJ9nlNsL8mjvjp9mHWJT6qc0Wncm8v+F7i9QkyKERBOAZXdBOCjNHDEQJL+8X4DRV+qzRLK41mQH/MEtoFHTnF1hvz3m1kNUlX6DXQO+0eWwyBZp745LOwblQiQoLQer7JrUwXuPRxMC+fPnCO9UFI8vJO3N91O3O3+ajH/AfI82exbXfSk3jLKV+T45+klCgzLoVL7qtg/VqKdXcAxt3y6bz4jRTYRXHEHme1/dep/te216bLax9y8tF1CDh9xJOsWes6ar2Hz4aglAfJ1OdFZ2LXJo+UpUrqsJvfYTnc0Jcq1KJvgm5Je/Kq7S3SlagrQKdODb0tf0GdqQtekw9PsDrJ1iznqqsT3tEeLMP4OgoGusPR7DVd9gc6DD61cks3qL5JCjNUM=
+    secure: LrEmDvilENK1iKGwX1hM40WSXzV7FYMVRSxSah/VBVUzRBuH94UKn7ivtEJdvp0xykkYasL9mGynqlru2DgO2vxc4jZA/yhqaF6cGK/9QpP7IEGN0CKWh1QwimYYfvtywdNO1HIsr157S2NhJ0WUhCQllU5VcP8nzKbPs8wF+APJvJSnDMg/zUg+Tb3JWK1pOSOwSCu6NPk266YN1yNsXp5BsgrwL+wPj2Jdhj4Cnh0wT2XitubrvThFGrIOhCMyth9hrp2AIq0JEFBPL7Tcxkyswdh0N1LNAu2gV3yD97kbKQQmATwbTnYrVtC/tO2x5LpwLwb5gqoGrfNuxEzNlyHCPLlXXxaupkQmwFdMNfDBW16WidXYcesxmzrXXOteROeHiJw37kkFnxxVMLmxOlTuBvcJBUIn0mDXl4bO/BC3GwtKC3CIIRjBqb9cd1onxvEpTjgDyslhBg+1jDKiIvqOsKdO3ieqkGAuxlIudt/dRfwykO58MGbPg0Ni33Nn9mPkGTLJQzMF6XZhlK7nCm6lTF+hqNS6TiwHVKaphiTBYJYyjZFjjrAL6LZCb9oj6XYy4zl9yorCEVK5m0xOuWCT2U4SK4XKmp4ZIBKmk+C47Z01KwM5gDAbCqIvztM0sFGr2mWJopW1Mqf9hq2yY2yQBuB9QWRX38Nhr4jfl0k=
+
   on:
-    branch: develop
-  app:
-    master: karazinnews-staging
+    branch: master
+  app: karazinnews-staging
 
 notifications:
   email:

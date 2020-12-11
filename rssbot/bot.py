@@ -22,10 +22,12 @@ logger = logging.getLogger(__name__)
 class RSSBot:
     DELAY_BETWEEN_MESSAGES = 5
     PUBLICATION_PAUSE = 0
-
-    POST_MESSAGE = "<b>{title}</b>\n\n<i>via</i> {link}"
-    TELEGRAPH_TML = (
-        '<img src="{img}"/>{text}<p><i>Source: </i><a href="{link}">{slink}</a></p>'
+    POST_MESSAGE = '<b>{title}</b>\n\n<i>via</i> {link}'
+    TELEGRAPH_TML_WITHOUT_IMAGE = (
+        '{text}<p><i>Source: </i><a href="{link}">{simple_link}</a></p>'
+    )
+    TELEGRAPH_TML_WITH_IMAGE = (
+        '<img src="{img}"/>' + TELEGRAPH_TML_WITHOUT_IMAGE
     )
 
     def __init__(
@@ -64,15 +66,21 @@ class RSSBot:
         article.parse()
         article.nlp()
 
-        image = upload_image(article.top_image)
         parsed_uri = urlparse(link)
-        telegraph_text = self.TELEGRAPH_TML.format(
-            img=image,
-            text="".join(map(lambda s: f"<p>{s}</p>", article.text.split("\n"))),
-            slink=parsed_uri.netloc,
-            link=self._shortener_obj.get_short_link(link),
-        )
+        params = {
+            'text': ''.join(map(lambda s: f'<p>{s}</p>', article.text.split('\n'))),
+            'simple_link': parsed_uri.netloc,
+            'link': self._shortener_obj.get_short_link(link),
+        }
 
+        telegraph_tmpl = self.TELEGRAPH_TML_WITHOUT_IMAGE
+
+        if article.top_image:
+            telegraph_tmpl = self.TELEGRAPH_TML_WITH_IMAGE
+            image = upload_image(article.top_image)
+            params.update({'img': image})
+
+        telegraph_text = telegraph_tmpl.format(**params)
         telegraph_url = html_telegraph_poster.upload_to_telegraph(
             title=title,
             author="RSS bot",

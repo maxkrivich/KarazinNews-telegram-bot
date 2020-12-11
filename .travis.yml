@@ -6,7 +6,7 @@ python:
   - "3.8"
 
 install:
-  - pip install -r requirements-dev.txt
+  - pip install -r requirements-ci.txt
 
 before_script:
   - time flake8 rssbot/

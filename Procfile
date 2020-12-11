@@ -1,1 +1,1 @@
-clock: python rssbot.py
+clock: python run.py

@@ -18,7 +18,7 @@ deploy:
   api_key:
     secure: BI32xLyaO64yS1YNCTodhmnXb9hGeeZIDPPhMw18OBKXMYFC8/vjioeJiQMHNDryBhtttTKD+uXXMPfvmZ94UdPaKynv5p9fYSrwWM7A937OCoH3Bvdze4J/wtVqc8SuSH5pEBpkexCHdI6kFj0aNfOppKKc7eroUi1IrREm5rW+ujRw/iYk9aZBzaq2LUQK6zifqVwUbb747LvAD2Gsq11DsqSXx1A/gCcy5hqLBczfoTgePgkF4yANA+wrinJugT48ayMKZ4txSg7JjbpPowvZTUTt5MAmiJ9nlNsL8mjvjp9mHWJT6qc0Wncm8v+F7i9QkyKERBOAZXdBOCjNHDEQJL+8X4DRV+qzRLK41mQH/MEtoFHTnF1hvz3m1kNUlX6DXQO+0eWwyBZp745LOwblQiQoLQer7JrUwXuPRxMC+fPnCO9UFI8vJO3N91O3O3+ajH/AfI82exbXfSk3jLKV+T45+klCgzLoVL7qtg/VqKdXcAxt3y6bz4jRTYRXHEHme1/dep/te216bLax9y8tF1CDh9xJOsWes6ar2Hz4aglAfJ1OdFZ2LXJo+UpUrqsJvfYTnc0Jcq1KJvgm5Je/Kq7S3SlagrQKdODb0tf0GdqQtekw9PsDrJ1iznqqsT3tEeLMP4OgoGusPR7DVd9gc6DD61cks3qL5JCjNUM=
   on:
-    branch: master
+    branch: develop
   app:
     master: karazinnews-staging
 

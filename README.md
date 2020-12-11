@@ -1,4 +1,4 @@
-# KarazinNews RSS telegram bot
+# KarazinNews RSS Telegram Bot
 [![License](https://img.shields.io/badge/license-MIT%20license-green.svg?style=flat)]()
 [![Telegram](https://img.shields.io/badge/telegram-channel-orange.svg?style=flat)](https://t.me/karazina)
 [![Python](https://img.shields.io/badge/python-3.8-blue.svg?style=flat)]()
@@ -37,7 +37,14 @@ $ docker-compose -f docker-compose.dev.yaml up -d
 
 # step 4: Launch script
 $ python run.py
+```
 
+Now lets copy heroku api-key and add it to the .travis.yml using ruby travis gem.
+```bash
+$ brew install heroku
+$ heroku login
+$ gem install travis
+$ travis encrypt $(heroku auth:token) --add deploy.api_key
 ```
 
 If you find [bugs] or have [suggestions] about improving the module, don't hesitate to contact me.
@@ -45,6 +52,20 @@ If you find [bugs] or have [suggestions] about improving the module, don't hesit
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/maxkrivich/KarazinNews-telegram-bot/blob/master/LICENSE) file for details
+
+
+## Useful links
+https://www.terraform.io/docs/cloud/index.html
+
+https://docs.travis-ci.com/user/deployment/heroku/
+
+https://devcenter.heroku.com/articles/getting-started-with-python
+
+https://telegra.ph/
+
+https://core.telegram.org/
+
+https://docs.docker.com/compose/compose-file/
 
 Copyright (c) 2017-2020 - Maxim Krivich
 

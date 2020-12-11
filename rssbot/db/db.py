@@ -1,5 +1,4 @@
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from rssbot.db import Base
@@ -13,4 +12,3 @@ class Database:
         Session = sessionmaker(bind=engine)
         self.session = Session()
         Base.metadata.create_all(engine)
-

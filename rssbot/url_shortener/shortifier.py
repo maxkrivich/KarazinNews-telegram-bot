@@ -40,7 +40,7 @@ class BitlyShortifier(URLShortifier):
             "longUrl": link,
         }
 
-        return super()._send_request({}, params=params) ["data"]["url"] or link
+        return super()._send_request({}, params=params)["data"]["url"] or link
 
 
 class GooglShortifier(URLShortifier):

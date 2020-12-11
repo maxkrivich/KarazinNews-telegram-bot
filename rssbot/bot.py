@@ -26,7 +26,7 @@ class RSSBot:
     TELEGRAPH_TML_WITHOUT_IMAGE = (
         '{text}<p><i>Source: </i><a href="{link}">{simple_link}</a></p>'
     )
-    TELEGRAPH_TML_WITH_IMAGE =(
+    TELEGRAPH_TML_WITH_IMAGE = (
         '<img src="{img}"/>' + TELEGRAPH_TML_WITHOUT_IMAGE
     )
 

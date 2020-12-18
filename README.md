@@ -27,6 +27,7 @@ $ cd KarazinNews-telegram-bot
 $ virtualenv --python=python3.8 .venv
 $ source .venv/bin/activate
 $ pip install -r requirements-dev.txt
+$ pre-commit install
 
 # step 2: Specify environment variables
 $ cp .env.example .env
@@ -41,10 +42,22 @@ $ python run.py
 
 Now lets copy heroku api-key and add it to the .travis.yml using ruby travis gem.
 ```bash
-$ brew install heroku
+$ brew install heroku/brew/heroku
 $ heroku login
 $ gem install travis
 $ travis encrypt $(heroku auth:token) --add deploy.api_key
+```
+
+How to setup database auto-backups
+```bash
+# Schedule auto-backups
+$ heroku pg:backups:schedule DATABASE_URL --at '02:00 Europe/Kiev' --app <app-name>
+# List of backups
+$ heroku pg:backups:schedules --app <app-name>
+$ heroku pg:backups --app <app-name>
+$ heroku pg:backups:info <backup-name> --app <app-name>
+# Unschedule auto-backups
+$ heroku pg:backups:unschedule DATABASE_URL --app <app-name>
 ```
 
 If you find [bugs] or have [suggestions] about improving the module, don't hesitate to contact me.
@@ -67,6 +80,10 @@ https://core.telegram.org/
 
 https://docs.docker.com/compose/compose-file/
 
+https://devcenter.heroku.com/articles/heroku-postgres-backups
+
+
+# 
 Copyright (c) 2017-2020 - Maxim Krivich
 
 

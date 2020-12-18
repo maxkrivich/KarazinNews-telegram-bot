@@ -27,6 +27,7 @@ $ cd KarazinNews-telegram-bot
 $ virtualenv --python=python3.8 .venv
 $ source .venv/bin/activate
 $ pip install -r requirements-dev.txt
+$ pre-commit install
 
 # step 2: Specify environment variables
 $ cp .env.example .env

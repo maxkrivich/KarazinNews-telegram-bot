@@ -6,17 +6,18 @@
 [![Build Status](https://travis-ci.org/maxkrivich/KarazinNews-telegram-bot.svg?branch=master)](https://travis-ci.org/maxkrivich/KarazinNews-telegram-bot)
 
 
-This is an unofficial Telegram-bot for [V.N. Karazin University](http://univer.kharkov.ua/en) which aggregates several useful sources for each student and professor of the uni. The main idea behind is quite simple to have all of the news in one [place](https://t.me/karazina).
+This is an unofficial Telegram-bot for [V.N. Karazin University](http://univer.kharkov.ua/en) which aggregates several useful news sources for students of the Uni.
+The main idea behind to get news from RSS-feeds and publish updates to a certain telegram [channel](https://t.me/karazina) where students could read it in a comfortable way from their mobile devices.
 
 ![image](https://user-images.githubusercontent.com/12199867/101933467-87ac6c00-3bdc-11eb-97e9-9d2364435f98.png)
 
 
 ## Tech details
-The bot is written in Python 3.8 and deployed into Heroku Cloud with Travis CI. In the current implementation, bot are using RSS-feed of various new sources.
+The bot has been written in Python 3.8 and deployed into Heroku Cloud with Travis CI.
 
 
 ### Local testing
-If you are interested in contributing to the project you are very welcome! In this section, you can find commands which help you to setup the project on your local machine.
+If you are interested in contributing to the project you are very welcome! In this section, you can find commands which help you to set up the project on your local machine.
 
 ```bash
 # step 0: Clone the repo
@@ -40,7 +41,7 @@ $ docker-compose -f docker-compose.dev.yaml up -d
 $ python run.py
 ```
 
-Now lets copy heroku api-key and add it to the .travis.yml using ruby travis gem.
+How to setup heroku api-key for `.travis.yml` using ruby travis gem.
 ```bash
 $ brew install heroku/brew/heroku
 $ heroku login
@@ -48,7 +49,7 @@ $ gem install travis
 $ travis encrypt $(heroku auth:token) --add deploy.api_key
 ```
 
-How to setup database auto-backups
+How to setup database auto-backups.
 ```bash
 # Schedule auto-backups
 $ heroku pg:backups:schedule DATABASE_URL --at '02:00 Europe/Kiev' --app <app-name>
@@ -64,12 +65,14 @@ If you find [bugs] or have [suggestions] about improving the module, don't hesit
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/maxkrivich/KarazinNews-telegram-bot/blob/master/LICENSE) file for details
+This project is licensed under the terms of the MIT license - see the [LICENSE](https://github.com/maxkrivich/KarazinNews-telegram-bot/blob/master/LICENSE) file for details
 
 
 ## Useful links
+<details><summary>click here</summary>
+  
 https://www.terraform.io/docs/cloud/index.html
-
+  
 https://docs.travis-ci.com/user/deployment/heroku/
 
 https://devcenter.heroku.com/articles/getting-started-with-python
@@ -81,6 +84,8 @@ https://core.telegram.org/
 https://docs.docker.com/compose/compose-file/
 
 https://devcenter.heroku.com/articles/heroku-postgres-backups
+
+</details>
 
 
 # 
